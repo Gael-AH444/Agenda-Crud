@@ -1,0 +1,74 @@
+﻿@model List<ContactModel>
+@{
+	ViewData["Title"] = "Lista de Contactos";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+	<div class="card-header">
+		Lista Contacto
+	</div>
+	<div class="card-body">
+		<a asp-action="Guardar" asp-controller="Mantenedor" class="btn btn-success"><i class="bi bi-plus-circle"></i> Crear nuevo contacto</a>
+		<hr />
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Nombre</th>
+					<th scope="col">Apellido Paterno</th>
+					<th scope="col">Apellido Materno</th>
+					<th scope="col">Alias</th>
+					<th scope="col">Fecha Nacimiento</th>
+					<th scope="col">Correo(s)</th>
+					<th scope="col">Telefono(s)</th>
+					<th scope="col">Direccion(es)</th>
+					<th scope="col">Acciones</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td>@item.nombre</td>
+						<td>@item.apellido_paterno</td>
+						<td>@item.apellido_materno</td>
+						<td>@item.alias</td>
+						<td>@item.fecha_nacimiento.ToString("dd/MM/yyyy")</td>
+						<td>
+							<select class="form-select">
+								@foreach (var correo in item.CorreosElectronicos)
+								{
+									<option value="@correo.idCorreo">@correo.correo</option>
+								}
+							</select>
+						</td>
+						<td>
+							<select class="form-select">
+								@foreach (var tel in item.Telefonos)
+								{
+									<option value="@tel.idTelefono">@tel.etiqueta - @tel.telefono</option>
+								}
+							</select>
+						</td>
+						<td>
+							<select class="form-select">
+								@foreach (var dir in item.Direcciones)
+								{
+									<option value="@dir.idDireccion">@dir.direccion</option>
+								}
+							</select>
+						</td>
+						<td>
+							<a asp-action="VerInformacion" asp-controller="Mantenedor" class="btn btn-primary btn-sm" asp-route-idContacto="@item.id"><i class="bi bi-info-circle"></i> </a>
+							<a asp-action="Editar" asp-controller="Mantenedor" class="btn btn-warning btn-sm" asp-route-idContacto="@item.id"><i class="bi bi-pencil"></i> </a>
+							<a asp-action="Eliminar" asp-controller="Mantenedor" class="btn btn-danger btn-sm" asp-route-idContacto="@item.id"><i class="bi bi-trash"></i> </a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+

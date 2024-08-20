@@ -1,0 +1,46 @@
+﻿.form-label {
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.card-header {
+    background-color: #1c69bb;
+    font-size: 18px;
+    font-weight:bold;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+    .card-body img{
+        max-width: 350px; /* Ajusta el tamaño máximo si es necesario */
+        border-radius: 10px;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+    }
+
+.text-center {
+    text-align: center; /* Centra el contenido */
+    margin-left: 0; /* Ajusta el margen izquierdo si es necesario */
+    margin-bottom: 10px; /* Ajusta el margen inferior si es necesario */
+}
+
+
+.label-fotografia-actual {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    text-align:center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: block; /* Asegura que el label sea un elemento de bloque */
+}
+
+.image-container {
+    text-align: center; /* Centra la imagen */
+}

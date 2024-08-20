@@ -1,0 +1,339 @@
+﻿@model ContactModel
+@{
+	ViewData["Title"] = "Editar";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	if (Model.CorreosElectronicos == null || Model.Telefonos == null || Model.Direcciones == null)
+	{
+		Model.CorreosElectronicos = new List<EmailModel>();
+		Model.Telefonos = new List<PhoneModel>();
+		Model.Direcciones = new List<AddressModel>();
+	}
+}
+
+<div class="card">
+	<div class="card-header">
+		Editar Contacto
+	</div>
+	<div class="card-body">
+		@using (Html.BeginForm("Editar", "Mantenedor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+		{
+			//Almacena id y lo aculta
+			<input asp-for="id" type="hidden" class="form-control">
+			<div class="row">
+				<div class="col-md-6">
+					<!-- Mostrar imagen actual -->
+					<div class="mb-3">
+						<label class="form-label label-fotografia-actual">Fotografía Actual</label>
+						<div class="image-container">
+							@if (Model.fotografia != null)
+							{
+								<img id="imagePreview" src="data:image;base64,@(Convert.ToBase64String(Model.fotografia))" alt="Imagen actual" class="img-thumbnail" />
+
+							}
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Fotografía<span class="text-danger">*</span></label>
+						@Html.DropDownListFor(m => m.fotografiaRuta, new SelectList(ViewBag.Images, Model.fotografiaRuta), "Seleccione una imagen", new { @class = "form-control", @onchange = "updateImagePreview(this)" })
+						@Html.ValidationMessageFor(m => m.fotografiaRuta, "", new { @class = "text-danger" })
+					</div>
+
+				</div>
+				<div class="col-md-6">
+					<div class="mb-3">
+						<label class="form-label">Nombre<span class="text-danger">*</span></label>
+						@Html.TextBoxFor(m => m.nombre, new { @class = "form-control" })
+						@Html.ValidationMessageFor(m => m.nombre, "", new { @class = "text-danger" })
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Apellido Paterno<span class="text-danger">*</span></label>
+						@Html.TextBoxFor(m => m.apellido_paterno, new { @class = "form-control" })
+						@Html.ValidationMessageFor(m => m.apellido_paterno, "", new { @class = "text-danger" })
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Apellido Materno<span class="text-danger">*</span></label>
+						@Html.TextBoxFor(m => m.apellido_materno, new { @class = "form-control" })
+						@Html.ValidationMessageFor(m => m.apellido_materno, "", new { @class = "text-danger" })
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Alias<span class="text-danger">*</span></label>
+						@Html.TextBoxFor(m => m.alias, new { @class = "form-control" })
+						@Html.ValidationMessageFor(m => m.alias, "", new { @class = "text-danger" })
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Fecha de nacimiento<span class="text-danger">*</span></label>
+						@Html.EditorFor(m => m.fecha_nacimiento, new { htmlAttributes = new { @type = "date", @class = "form-control" } })
+						@Html.ValidationMessageFor(m => m.fecha_nacimiento, "", new { @class = "text-danger" })
+					</div>
+					<br />
+
+					<!-- Sección para agregar correos electrónicos -->
+					<div class="mb-3">
+						<label class="form-label">Correo Electrónico</label>
+						<div class="input-group">
+							<input type="email" id="newEmail" class="form-control" placeholder="Ingresa tu correo" />
+							<button type="button" class="btn btn-success" id="btnAddEmail">Agregar correo a la lista</button>
+						</div>
+						<span id="emailError" class="text-danger" style="display:none;">Por favor, ingrese un correo electrónico válido.</span>
+					</div>
+					<!-- Tabla para mostrar los correos electrónicos agregados -->
+					<table class="table table-dark table-hover" id="emailsTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Correo Electrónico</th>
+								<th>Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (int i = 0; i < Model.CorreosElectronicos.Count; i++)
+							{
+								<tr>
+									<td class="email-index">@((i + 1))</td>
+									<td>
+										<input type="email" name="CorreosElectronicos[@i].correo" value="@Model.CorreosElectronicos[i].correo" class="form-control" readonly />
+									</td>
+									<td>
+										<button type="button" class="btn btn-danger btn-delete-email">
+											<i class="bi bi-trash"></i>
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+
+					<!-- Sección para agregar teléfonos -->
+					<div class="mb-3">
+						<label class="form-label">Teléfono</label>
+						<div class="input-group">
+							<input type="text" id="newPhone" class="form-control" placeholder="Número de teléfono" />
+							<input type="text" id="phoneLabel" class="form-control" placeholder="Tipo de teléfono" />
+							<button type="button" class="btn btn-success" id="btnAddPhone">Agregar teléfono a la lista</button>
+						</div>
+						<span id="phoneError" class="text-danger" style="display:none;">Por favor, ingrese un teléfono y tipo válidos.</span>
+					</div>
+					<!-- Tabla para mostrar los teléfonos agregados -->
+					<table class="table table-dark table-hover" id="phonesTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Teléfono</th>
+								<th>Etiqueta</th>
+								<th>Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (int i = 0; i < Model.Telefonos.Count; i++)
+							{
+								<tr>
+									<td class="phone-index">@((i + 1))</td>
+									<td>
+										<input type="text" name="Telefonos[@i].telefono" value="@Model.Telefonos[i].telefono" class="form-control" readonly />
+									</td>
+									<td>
+										<input type="text" name="Telefonos[@i].etiqueta" value="@Model.Telefonos[i].etiqueta" class="form-control" readonly />
+									</td>
+									<td>
+										<button type="button" class="btn btn-danger btn-delete-phone">
+											<i class="bi bi-trash"></i>
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+					<br />
+
+
+					<!-- Sección para agregar direcciones -->
+					<div class="mb-3">
+						<label class="form-label">Direccion</label>
+						<div class="input-group">
+							<input type="text" id="newAddress" class="form-control" placeholder="Ingresa una direccion" />
+							<button type="button" class="btn btn-success" id="btnAddAddress">Agregar direccion a la lista</button>
+						</div>
+						<span id="addressError" class="text-danger" style="display:none;">Por favor, ingrese una direccion valida.</span>
+					</div>
+					<!-- Tabla para mostrar las direcciones agregadas -->
+					<table class="table table-dark table-hover" id="addressTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Direccion</th>
+								<th>Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (int i = 0; i < Model.Direcciones.Count; i++)
+							{
+								<tr>
+									<td class="address-index">@((i + 1))</td>
+									<td>
+										<input type="text" name="Direcciones[@i].direccion" value="@Model.Direcciones[i].direccion" class="form-control" readonly />
+									</td>
+									<td>
+										<button type="button" class="btn btn-danger btn-delete-address">
+											<i class="bi bi-trash"></i>
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+
+					<br />
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Guardar Cambios</button>
+			<a asp-action="Listar" asp-controller="Mantenedor" class="btn btn-warning">Volver a la lista</a>
+		}
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			var emailCounter = @Model.CorreosElectronicos.Count;
+
+			$('#btnAddEmail').click(function () {
+				var newEmail = $('#newEmail').val();
+				if (newEmail) {
+					emailCounter++;
+					var html = '<tr>' +
+						'<td class="email-index">' + emailCounter + '</td>' +
+						'<td><input type="email" name="CorreosElectronicos[' + (emailCounter - 1) + '].correo" value="' + newEmail + '" class="form-control" readonly /></td>' +
+						'<td><button type="button" class="btn btn-danger btn-delete-email"><i class="bi bi-trash"></i></button></td>' +
+						'</tr>';
+					$('#emailsTable tbody').append(html);
+					$('#newEmail').val(''); // Clear the input field
+					$('#emailError').hide(); // Hide the error message
+				} else {
+					$('#emailError').show(); // Show the error message
+				}
+			});
+
+			// Delegated event handler for dynamically added buttons
+			$('#emailsTable').on('click', '.btn-delete-email', function () {
+				$(this).closest('tr').remove();
+				updateEmailIndices();
+			});
+
+			function updateEmailIndices() {
+				$('#emailsTable tbody tr').each(function (index) {
+					$(this).find('.email-index').text(index + 1);
+					$(this).find('input[type="email"]').attr('name', 'CorreosElectronicos[' + index + '].correo');
+				});
+				emailCounter = $('#emailsTable tbody tr').length;
+			}
+		});
+
+		// Funcion que controla los telefonos y la tabla
+		$(document).ready(function () {
+			$('#btnAddPhone').click(function () {
+				var newPhone = $('#newPhone').val().trim();
+				var phoneLabel = $('#phoneLabel').val().trim();
+
+				// Validación básica
+				if (newPhone === '' || phoneLabel === '') {
+					$('#phoneError').show();
+					return;
+				}
+
+				// Agregar a la tabla
+				var index = $('#phonesTable tbody tr').length + 1;
+				var newRow = '<tr>' +
+					'<td class="phone-index">' + index + '</td>' +
+					'<td><input type="text" name="Telefonos[' + (index - 1) + '].telefono" value="' + newPhone + '" class="form-control" readonly /></td>' +
+					'<td><input type="text" name="Telefonos[' + (index - 1) + '].etiqueta" value="' + phoneLabel + '" class="form-control" readonly /></td>' +
+					'<td><button type="button" class="btn btn-danger btn-delete-phone"><i class="bi bi-trash"></i></button></td>' +
+					'</tr>';
+				$('#phonesTable tbody').append(newRow);
+
+				// Limpiar campos y errores
+				$('#newPhone').val('');
+				$('#phoneLabel').val('');
+				$('#phoneError').hide();
+
+				// Actualizar los índices
+				updatePhoneIndices();
+			});
+
+			// Evento para eliminar teléfono
+			$(document).on('click', '.btn-delete-phone', function () {
+				$(this).closest('tr').remove();
+
+				// Actualizar los índices
+				updatePhoneIndices();
+			});
+
+			function updatePhoneIndices() {
+				$('#phonesTable tbody tr').each(function (index) {
+					$(this).find('.phone-index').text(index + 1);
+					$(this).find('input[name*="telefono"]').attr('name', 'Telefonos[' + index + '].telefono');
+					$(this).find('input[name*="etiqueta"]').attr('name', 'Telefonos[' + index + '].etiqueta');
+				});
+			}
+		});
+
+
+
+		// Funcion que controla las direcciones y la tabla
+		$(document).ready(function () {
+			$('#btnAddAddress').click(function () {
+				var newAddress = $('#newAddress').val().trim();
+
+				// Validación básica
+				if (newAddress === '') {
+					$('#addressError').show();
+					return;
+				}
+
+				// Agregar a la tabla
+				var index = $('#addressTable tbody tr').length + 1;
+				var newRow = '<tr>' +
+					'<td class="address-index">' + index + '</td>' +
+					'<td><input type="text" name="Direcciones[' + (index - 1) + '].direccion" value="' + newAddress + '" class="form-control" readonly /></td>' +
+					'<td><button type="button" class="btn btn-danger btn-delete-address"><i class="bi bi-trash"></i></button></td>' +
+					'</tr>';
+				$('#addressTable tbody').append(newRow);
+
+				// Limpiar campos y errores
+				$('#newAddress').val('');
+				$('#addressError').hide();
+
+				// Actualizar los índices
+				updateAddressIndices();
+			});
+
+			// Evento para eliminar dirección
+			$(document).on('click', '.btn-delete-address', function () {
+				$(this).closest('tr').remove();
+
+				// Actualizar los índices
+				updateAddressIndices();
+			});
+
+			function updateAddressIndices() {
+				$('#addressTable tbody tr').each(function (index) {
+					$(this).find('.address-index').text(index + 1);
+					$(this).find('input[name*="direccion"]').attr('name', 'Direcciones[' + index + '].direccion');
+				});
+			}
+		});
+
+
+		function updateImagePreview(selectElement) {
+			var selectedImage = selectElement.value;
+			var imagePreview = document.getElementById("imagePreview");
+			if (selectedImage) {
+				var imagePath = '/images/' + selectedImage;
+				imagePreview.src = imagePath;
+			} else {
+				imagePreview.src = "";
+			}
+		}
+
+	</script>
+}

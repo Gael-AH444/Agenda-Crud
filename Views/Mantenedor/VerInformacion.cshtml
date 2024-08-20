@@ -1,0 +1,83 @@
+﻿@model ContactModel
+@{
+    ViewData["Title"] = "Informacion de Contacto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        Visualizar Contacto
+    </div>
+    <div class="card-body">
+        <form asp-action="VerInformacion" asp-controller="Mantenedor">
+            <input asp-for="id" type="hidden" class="form-control">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Div para la imagen ajustada -->
+                    <div class="text-center">
+                        <img src="data:image;base64,@(Convert.ToBase64String(Model.fotografia))" alt="Imagen" class="img-fluid" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre:</label>
+                        <div class="form-control-plaintext">@Model.nombre</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apellido Paterno:</label>
+                        <div class="form-control-plaintext">@Model.apellido_paterno</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apellido Materno:</label>
+                        <div class="form-control-plaintext">@Model.apellido_materno</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alias:</label>
+                        <div class="form-control-plaintext">@Model.alias</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de nacimiento:</label>
+                        <div class="form-control-plaintext">@Model.fecha_nacimiento.ToString("dd-MM-yyyy")</div>
+                    </div>
+
+                    <!-- Bloque para mostrar los correos electrónicos -->
+                    <div class="mb-3">
+                        <label class="form-label">Correo(s) Electrónico(s):</label>
+                        <ul class="form-control-plaintext" class="list-group list-group-flush">
+                            @foreach (var correo in Model.CorreosElectronicos)
+                            {
+                                <li class="list-group-item">@correo.correo</li>
+                            }
+                        </ul>
+                    </div>
+
+                    <!-- Bloque para mostrar los telefonos -->
+                    <div class="mb-3">
+                        <label class="form-label">Telefono(s):</label>
+                        <ul class="form-control-plaintext" class="list-group list-group-flush">
+                            @foreach (var tel in Model.Telefonos)
+                            {
+                                <li class="list-group-item">@tel.etiqueta - @tel.telefono</li>
+                            }
+                        </ul>
+                    </div>
+
+                    <!-- Bloque para mostrar las direcciones -->
+                    <div class="mb-3">
+                        <label class="form-label">Direccion(es):</label>
+                        <ul class="form-control-plaintext" class="list-group list-group-flush">
+                            @foreach (var dir in Model.Direcciones)
+                            {
+                                <li class="list-group-item">@dir.direccion</li>
+                            }
+                        </ul>
+                    </div> 
+                </div>
+            </div>
+            <hr />
+            <a asp-action="Listar" asp-controller="Mantenedor" class="btn btn-primary">Volver a la lista</a>
+        </form>
+    </div>
+</div>
+
